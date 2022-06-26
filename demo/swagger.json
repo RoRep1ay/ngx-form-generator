@@ -1,47 +1,76 @@
 {
   "swagger": "2.0",
-  "info": { "version": "v1", "title": "My API" },
+  "info": {
+    "version": "v1",
+    "title": "My API"
+  },
   "paths": {
     "/api/Users": {
       "get": {
-        "tags": ["Address"],
+        "tags": [
+          "Address"
+        ],
         "operationId": "ApiAddressGet",
         "consumes": [],
-        "produces": ["text/plain", "application/json", "text/json"],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
         "parameters": [],
         "responses": {
           "200": {
             "description": "Success",
             "schema": {
               "type": "array",
-              "items": { "$ref": "#/definitions/AddressModel" }
+              "items": {
+                "$ref": "#/definitions/AddressModel"
+              }
             }
           }
         }
       },
       "post": {
-        "tags": ["Address"],
+        "tags": [
+          "Address"
+        ],
         "operationId": "ApiAddressPost",
-        "consumes": ["application/json"],
+        "consumes": [
+          "application/json"
+        ],
         "produces": [],
         "parameters": [
           {
             "name": "model",
             "in": "body",
             "required": false,
-            "schema": { "$ref": "#/definitions/AddressModel" }
+            "schema": {
+              "$ref": "#/definitions/AddressModel"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Success" },
-          "400": { "description": "Bad Request" }
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
         }
       }
     }
   },
   "definitions": {
     "AddressModel": {
-      "required": ["firstName", "lastName", "address", "city", "postalCode", "emailAddress"],
+      "required": [
+        "firstName",
+        "lastName",
+        "address",
+        "city",
+        "postalCode",
+        "emailAddress",
+        "school"
+      ],
       "type": "object",
       "properties": {
         "firstName": {
@@ -49,6 +78,44 @@
           "minLength": 1,
           "pattern": "^[a-zA-Z\\'\\s]+$",
           "type": "string"
+        },
+        "school": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-zA-Z\\'\\s]+$",
+              "maxLength": 100
+            },
+            "test": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          }
+        },
+        "aliases": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "required": ["name", "test"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-zA-Z\\'\\s]+$",
+                "maxLength": 100
+              },
+              "test": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            }
+          }
         },
         "lastName": {
           "maxLength": 100,

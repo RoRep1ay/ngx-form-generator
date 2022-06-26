@@ -2,4 +2,4 @@
  * Public API Surface of forms
  */
 
-export * from './lib/MyApi';
+export * from './lib/myApi';

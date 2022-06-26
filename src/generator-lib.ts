@@ -42,6 +42,7 @@ export function makeFileName(swagger: OpenAPI.Document): string | undefined {
 }
 
 function makeFieldRules(fieldName: string, definition: Definition): string {
+  console.log('defintion isn make field rules is ', definition);
   return rules
     .map(rule => rule(fieldName, definition))
     .filter(item => item != '')
@@ -49,6 +50,15 @@ function makeFieldRules(fieldName: string, definition: Definition): string {
 }
 
 function makeField(fieldName: string, definition: Definition): string {
+  console.log('make field is ', { fieldName, definition});
+  console.log('asdfasdf', definition.properties[fieldName]['type']);
+  if (definition.properties[fieldName]['type'] === 'array') {
+    return `"${fieldName}": new FormArray([], [${makeFieldRules(fieldName, definition)}])`;
+  } else if (definition.properties[fieldName]['type'] === 'object') {
+    const constructFormGroup = makeFieldsBody(definition.properties[fieldName]);
+    return `"${fieldName}": new FormGroup({${constructFormGroup}})`;
+  }
+
   return `"${fieldName}": new FormControl(null, [${makeFieldRules(fieldName, definition)}])`;
 }
 
@@ -76,8 +86,10 @@ function makeDefinition(definitionName: string, definition: Definition): string 
     `;
 }
 
+
+
 function makeHeader(body: string): string {
-  return `import { FormGroup, FormControl, Validators } from '@angular/forms';
+  return `import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 
   ${body}`;
 }
