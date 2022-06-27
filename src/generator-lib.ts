@@ -42,7 +42,6 @@ export function makeFileName(swagger: OpenAPI.Document): string | undefined {
 }
 
 function makeFieldRules(fieldName: string, definition: Definition): string {
-  console.log('defintion isn make field rules is ', definition);
   return rules
     .map(rule => rule(fieldName, definition))
     .filter(item => item != '')
@@ -50,12 +49,13 @@ function makeFieldRules(fieldName: string, definition: Definition): string {
 }
 
 function makeField(fieldName: string, definition: Definition): string {
-  console.log('make field is ', { fieldName, definition});
-  console.log('asdfasdf', definition.properties[fieldName]['type']);
   if (definition.properties[fieldName]['type'] === 'array') {
-    return `"${fieldName}": new FormArray([], [${makeFieldRules(fieldName, definition)}])`;
+    const itemDefinition = definition.properties[fieldName]['items'];
+    const items = itemDefinition['type'] === 'object' ? `new FormGroup({${makeFieldsBody(itemDefinition)}})` : `new FormControl(null, [])`;
+    return `"${fieldName}": new FormArray([${items}])`;
   } else if (definition.properties[fieldName]['type'] === 'object') {
     const constructFormGroup = makeFieldsBody(definition.properties[fieldName]);
+    console.log('construct form group is ', constructFormGroup);
     return `"${fieldName}": new FormGroup({${constructFormGroup}})`;
   }
 
@@ -71,10 +71,17 @@ function makeFieldsBody(definition: Definition): string[] {
 
     return allOfFieldsBody;
   }
-  const fields = Object.keys(definition.properties);
-  const fieldsBody = fields.map(fieldName => makeField(fieldName, definition)).filter(item => item !== '');
+  if ('properties' in definition) {
+    const fields = Object.keys(definition.properties);
+    console.log('fields are ', fields);
+    const fieldsBody = fields.map(fieldName => makeField(fieldName, definition)).filter(item => item !== '');
 
-  return fieldsBody;
+    return fieldsBody;
+  } else {
+
+    // When items type are not array
+    return [`new FormControl(null)`]
+  }
 }
 
 function makeDefinition(definitionName: string, definition: Definition): string {
