@@ -59,7 +59,8 @@ function makeField(fieldName: string, definition: Definition): string {
     return `"${fieldName}": new FormGroup({${constructFormGroup}})`;
   }
 
-  return `"${fieldName}": new FormControl(null, [${makeFieldRules(fieldName, definition)}])`;
+  const value = 'default' in definition.properties[fieldName] ? `'${definition.properties[fieldName].default}'` : null;
+  return `"${fieldName}": new FormControl(${value}, [${makeFieldRules(fieldName, definition)}])`;
 }
 
 function makeFieldsBody(definition: Definition): string[] {
