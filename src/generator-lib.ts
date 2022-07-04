@@ -51,11 +51,26 @@ function makeFieldRules(fieldName: string, definition: Definition): string {
 function makeField(fieldName: string, definition: Definition): string {
   if (definition.properties[fieldName]['type'] === 'array') {
     const itemDefinition = definition.properties[fieldName]['items'];
-    const items = itemDefinition['type'] === 'object' ? `new FormGroup({${makeFieldsBody(itemDefinition)}})` : `new FormControl(null, [])`;
-    return `"${fieldName}": new FormArray([${items}])`;
+    const minItems = +definition.properties[fieldName]['minItems'] || 1;
+
+    const items: string[] = [];
+    if (itemDefinition['type'] === 'object') {
+      for (let i = 0; i <= minItems; i++) {
+        items.push(`new FormGroup({${makeFieldsBody(itemDefinition)}})`);
+      }
+    } else {
+      const _dummyProps: Definition = {
+        properties: {
+          dummy: itemDefinition
+        }
+      }
+      for (let i = 1; i <= minItems; i++) {
+        items.push( `new FormControl(null, [${makeFieldRules('dummy', _dummyProps)}])`);
+      }
+    }
+    return `"${fieldName}": new FormArray([${items.join(',')}])`;
   } else if (definition.properties[fieldName]['type'] === 'object') {
     const constructFormGroup = makeFieldsBody(definition.properties[fieldName]);
-    console.log('construct form group is ', constructFormGroup);
     return `"${fieldName}": new FormGroup({${constructFormGroup}})`;
   }
 
@@ -72,17 +87,10 @@ function makeFieldsBody(definition: Definition): string[] {
 
     return allOfFieldsBody;
   }
-  if ('properties' in definition) {
-    const fields = Object.keys(definition.properties);
-    console.log('fields are ', fields);
-    const fieldsBody = fields.map(fieldName => makeField(fieldName, definition)).filter(item => item !== '');
+  const fields = Object.keys(definition.properties);
+  const fieldsBody = fields.map(fieldName => makeField(fieldName, definition)).filter(item => item !== '');
 
-    return fieldsBody;
-  } else {
-
-    // When items type are not array
-    return [`new FormControl(null)`]
-  }
+  return fieldsBody;
 }
 
 function makeDefinition(definitionName: string, definition: Definition): string {

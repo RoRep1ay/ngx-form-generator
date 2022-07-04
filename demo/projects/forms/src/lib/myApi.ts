@@ -41,5 +41,8 @@ export const addressModelForm = new FormGroup({
     Validators.pattern(/^[\w\@\!\#\%\&\'\*\+\-\/\=\?\`\{\|\}\~\.]+$/),
     Validators.email
   ]),
-  country: new FormControl('Singapore', [Validators.required, Validators.minLength(1)])
+  country: new FormControl('Singapore', [
+    Validators.required,
+    Validators.minLength(1)
+  ])
 });
